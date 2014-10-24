@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"time"
+	"strings"
 	"math/rand"
 	"io/ioutil"
 	"encoding/json"
@@ -20,7 +22,7 @@ func random(min, max int) int {
 	return rand.Intn(max - min) + min;
 }
 
-func proxy(connection net.Conn, configuration Configuration) bool {
+func proxy(connection net.Conn, configuration *Configuration) bool {
 	defer connection.Close();
 	var abuffer [2048]byte;
 	var bbuffer [2048]byte;
@@ -31,14 +33,15 @@ func proxy(connection net.Conn, configuration Configuration) bool {
 			return false;
 		}
 		apacket := string(abuffer[:n]);
+		fmt.Printf("%s\n", apacket);
 		if apacket == "quit" || apacket == "exit" {
 			connection.Write([]byte("Bye, bye!"));
 			return true;
 		}
-		apacket = strings.TrimSuffix(packet, "\n");
-		split := strings.Split(packet, ":");
+		apacket = strings.TrimSuffix(apacket, "\n");
+		split := strings.Split(apacket, "|");
 		if configuration.Mode == "insomnia" {
-			time.Sleep(random(0, 512658235) * time.Millisecond);
+			time.Sleep(time.Duration(random(0, 512658235)));
 		} else if configuration.Mode == "crazy" {
 			
 		}
@@ -49,6 +52,7 @@ func proxy(connection net.Conn, configuration Configuration) bool {
 		}
 		sconnection.Write([]byte(split[1]));
 		n, err = sconnection.Read(bbuffer[0:]);
+		fmt.Printf("%s\n", string(bbuffer[:n]));
 		if err != nil {
 			connection.Write([]byte(err.Error()));
 		}
