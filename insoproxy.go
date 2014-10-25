@@ -15,6 +15,7 @@ type Configuration struct {
 	Socket string
 	Address string
 	Mode string
+	Insomnia int
 }
 
 func random(min, max int) int {
@@ -41,7 +42,9 @@ func proxy(connection net.Conn, configuration *Configuration) bool {
 		apacket = strings.TrimSuffix(apacket, "\n");
 		split := strings.Split(apacket, "|");
 		if configuration.Mode == "insomnia" {
-			time.Sleep(time.Duration(random(0, 512658235)));
+			rand := random(0, configuration.Insomnia);
+			fmt.Printf("%d\n", rand);
+			time.Sleep(time.Millisecond * time.Duration(rand));
 		} else if configuration.Mode == "crazy" {
 			
 		}
